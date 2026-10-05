@@ -162,7 +162,7 @@ function App() {
                   </details>
                   <details className="group px-5 py-4 sm:px-6">
                     <summary className="cursor-pointer list-none text-sm font-semibold">آیا فایل تصویر برای تحلیل آپلود می‌شود؟</summary>
-                    <p className="app-muted mt-2 text-xs leading-6">خیر. فایل تصویر و نام آن برای تحلیل به سرور ارسال نمی‌شود. فقط بعد از پایان موفق تحلیل، نوع نتیجه برای شمارش ناشناس میزان استفاده ثبت می‌شود؛ در D1 فقط شمارنده‌های تجمیعی روزانه نگه داشته می‌شوند.</p>
+                    <p className="app-muted mt-2 text-xs leading-6">خیر. تصویر، نام فایل، Prompt و Metadata برای تحلیل به سرور ارسال نمی‌شوند. بعد از پایان موفق تحلیل فقط نوع نتیجه برای شمارش ناشناس ثبت می‌شود؛ D1 فقط شمارنده‌های تجمیعی روزانه را نگه می‌دارد و Cloudflare Turnstile نیز صرفاً برای جلوگیری از ثبت مصنوعی آمار، اعتبار درخواست را بررسی می‌کند.</p>
                   </details>
                   <details className="group px-5 py-4 sm:px-6">
                     <summary className="cursor-pointer list-none text-sm font-semibold">چه فرمت‌هایی پشتیبانی می‌شوند؟</summary>
