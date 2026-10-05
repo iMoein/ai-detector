@@ -1,3 +1,4 @@
+import { getTurnstileToken } from './turnstile';
 import type { DetectionKind } from '../types';
 
 export interface UsageStats {
@@ -53,13 +54,14 @@ export async function fetchUsageStats(signal?: AbortSignal) {
 
 export async function trackAnalysis(result: DetectionKind) {
   try {
+    const turnstileToken = await getTurnstileToken();
     const response = await fetch(endpoint('/api/stats/analyze'), {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ result }),
+      body: JSON.stringify({ result, turnstileToken }),
       keepalive: true,
     });
     const stats = await parseStats(response);

@@ -1,6 +1,7 @@
 interface Env {
   DB: D1Database;
   ANALYSIS_RATE_LIMITER: RateLimit;
+  TURNSTILE_SECRET_KEY: string;
 }
 
 type AnalysisResult = 'ai' | 'edited' | 'camera' | 'unknown';
@@ -16,8 +17,13 @@ interface StatsRow {
   last_30_days: number | string | null;
 }
 
+const PRODUCTION_ORIGIN = 'https://ai-detector.imoein.com';
+const PRODUCTION_HOSTNAME = 'ai-detector.imoein.com';
+const TURNSTILE_ACTION = 'analysis_counter';
+const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+
 const ALLOWED_ORIGINS = new Set([
-  'https://ai-detector.imoein.com',
+  PRODUCTION_ORIGIN,
   'http://127.0.0.1:5173',
   'http://127.0.0.1:5174',
   'http://localhost:5173',
@@ -97,10 +103,64 @@ async function readStats(env: Env) {
   };
 }
 
+interface TurnstileVerification {
+  success: boolean;
+  hostname?: string;
+  action?: string;
+  'error-codes'?: string[];
+}
+
+async function verifyTurnstile(request: Request, env: Env, token: string) {
+  const form = new FormData();
+  form.set('secret', env.TURNSTILE_SECRET_KEY);
+  form.set('response', token);
+  const remoteIp = request.headers.get('CF-Connecting-IP');
+  if (remoteIp) form.set('remoteip', remoteIp);
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    const response = await fetch(TURNSTILE_VERIFY_URL, {
+      method: 'POST',
+      body: form,
+      signal: controller.signal,
+    });
+    if (!response.ok) return false;
+    const verification = await response.json<TurnstileVerification>();
+    return verification.success
+      && verification.hostname === PRODUCTION_HOSTNAME
+      && verification.action === TURNSTILE_ACTION;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function handleAnalyze(request: Request, env: Env) {
   const origin = request.headers.get('Origin');
-  if (!origin || !ALLOWED_ORIGINS.has(origin)) {
+  if (origin !== PRODUCTION_ORIGIN) {
     return json(request, { error: 'Origin not allowed' }, { status: 403 });
+  }
+
+  const requestHostname = new URL(request.url).hostname;
+  if (requestHostname !== PRODUCTION_HOSTNAME) {
+    return json(request, { error: 'Host not allowed' }, { status: 403 });
+  }
+
+  const fetchSite = request.headers.get('Sec-Fetch-Site');
+  if (fetchSite && fetchSite !== 'same-origin') {
+    return json(request, { error: 'Cross-site request rejected' }, { status: 403 });
+  }
+
+  const contentType = request.headers.get('Content-Type') ?? '';
+  if (!contentType.toLowerCase().startsWith('application/json')) {
+    return json(request, { error: 'Unsupported content type' }, { status: 415 });
+  }
+
+  const contentLength = Number(request.headers.get('Content-Length') ?? 0);
+  if (Number.isFinite(contentLength) && contentLength > 4096) {
+    return json(request, { error: 'Request too large' }, { status: 413 });
   }
 
   const rateLimitKey = request.headers.get('CF-Connecting-IP') ?? origin;
@@ -112,9 +172,9 @@ async function handleAnalyze(request: Request, env: Env) {
     });
   }
 
-  let payload: { result?: unknown };
+  let payload: { result?: unknown; turnstileToken?: unknown };
   try {
-    payload = await request.json() as { result?: unknown };
+    payload = await request.json() as { result?: unknown; turnstileToken?: unknown };
   } catch {
     return json(request, { error: 'Invalid JSON body' }, { status: 400 });
   }
@@ -122,6 +182,15 @@ async function handleAnalyze(request: Request, env: Env) {
   const result = payload.result;
   if (result !== 'ai' && result !== 'edited' && result !== 'camera' && result !== 'unknown') {
     return json(request, { error: 'Invalid analysis result' }, { status: 400 });
+  }
+
+  const turnstileToken = payload.turnstileToken;
+  if (typeof turnstileToken !== 'string' || turnstileToken.length < 20 || turnstileToken.length > 2048) {
+    return json(request, { error: 'Human verification required' }, { status: 403 });
+  }
+
+  if (!await verifyTurnstile(request, env, turnstileToken)) {
+    return json(request, { error: 'Human verification failed' }, { status: 403 });
   }
 
   const day = utcDay();

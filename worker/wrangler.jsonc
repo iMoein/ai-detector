@@ -3,7 +3,8 @@
   "name": "ai-detector-stats",
   "main": "src/index.ts",
   "compatibility_date": "2026-10-05",
-  "workers_dev": true,
+  "workers_dev": false,
+  "preview_urls": false,
   "routes": [
     {
       "pattern": "ai-detector.imoein.com/api/*",

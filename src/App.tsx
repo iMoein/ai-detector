@@ -206,6 +206,8 @@ function App() {
         )}
       </main>
 
+      <div id="usage-turnstile" className="fixed bottom-4 left-4 z-[100] max-w-[calc(100vw-2rem)]" aria-live="polite" />
+
       <footer className="app-muted mx-auto flex max-w-[1240px] flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 pb-8 text-center text-[10px] tracking-wide sm:px-6">
         <UsageCounter />
         <span aria-hidden="true">·</span>
