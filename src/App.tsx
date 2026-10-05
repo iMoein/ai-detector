@@ -202,7 +202,13 @@ function App() {
         )}
       </main>
 
-      <footer className="app-muted mx-auto max-w-[1240px] px-4 pb-8 text-center text-[10px] tracking-wide sm:px-6">بررسی تصویر · پردازش محلی و خصوصی</footer>
+      <footer className="app-muted mx-auto flex max-w-[1240px] flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 pb-8 text-center text-[10px] tracking-wide sm:px-6">
+        <span>بررسی تصویر · پردازش محلی و خصوصی</span>
+        <span aria-hidden="true">·</span>
+        <a href="https://imoein.com/" className="font-semibold text-zinc-700 underline decoration-zinc-300 underline-offset-4 transition-colors hover:text-zinc-950 dark:text-zinc-300 dark:decoration-zinc-700 dark:hover:text-white">
+          imoein.com
+        </a>
+      </footer>
     </div>
   );
 }
