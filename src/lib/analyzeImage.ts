@@ -2,6 +2,7 @@ import ExifReader from 'exifreader';
 import { unzlibSync } from 'fflate';
 import { hasAiC2paSource, hasAiEditedC2paSource, hasGeneratedC2paSource, readC2pa } from './c2pa';
 import type {
+  AnalysisProgress,
   C2paSummary,
   DetectedTool,
   DetectionMatch,
@@ -467,16 +468,58 @@ function c2paSection(c2pa?: C2paSummary): MetadataSection | null {
   ]);
 }
 
-export async function analyzeImage(file: File): Promise<ImageAnalysis> {
-  const buffer = await file.arrayBuffer();
+function readFileWithProgress(file: File, onProgress?: (progress: AnalysisProgress) => void) {
+  return new Promise<ArrayBuffer>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onprogress = (event) => {
+      if (!event.lengthComputable) return;
+      const ratio = event.total > 0 ? event.loaded / event.total : 0;
+      const percent = Math.max(2, Math.min(30, Math.round(ratio * 30)));
+      onProgress?.({
+        percent,
+        stage: 'reading',
+        label: 'در حال خواندن فایل',
+        detail: `${Math.round(ratio * 100).toLocaleString('fa-IR')}٪ از فایل خوانده شد`,
+      });
+    };
+    reader.onerror = () => reject(reader.error ?? new Error('خواندن فایل انجام نشد.'));
+    reader.onload = () => {
+      const result = reader.result;
+      if (!(result instanceof ArrayBuffer)) return reject(new Error('خواندن فایل انجام نشد.'));
+      onProgress?.({ percent: 30, stage: 'reading', label: 'فایل خوانده شد', detail: 'آماده بررسی متادیتا' });
+      resolve(result);
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+export async function analyzeImage(file: File, onProgress?: (progress: AnalysisProgress) => void): Promise<ImageAnalysis> {
+  onProgress?.({ percent: 1, stage: 'reading', label: 'آماده‌سازی فایل', detail: 'بررسی فایل روی همین دستگاه انجام می‌شود' });
+  const buffer = await readFileWithProgress(file, onProgress);
+  onProgress?.({ percent: 36, stage: 'metadata', label: 'خواندن متادیتا', detail: 'EXIF، XMP و اطلاعات فنی فایل' });
   let tags: Record<string, unknown> = {};
   try { tags = (await ExifReader.load(buffer, { expanded: false })) as unknown as Record<string, unknown>; } catch { tags = {}; }
+  onProgress?.({ percent: 45, stage: 'metadata', label: 'متادیتا خوانده شد', detail: 'در حال بررسی ساختار و اصالت فایل' });
 
   const cleanRaw = Object.fromEntries(Object.entries(tags).map(([key, value]) => [key, cleanValue(value)]));
-  const [container, c2pa] = await Promise.all([inspectContainer(buffer), readC2pa(file)]);
+  onProgress?.({ percent: 50, stage: 'provenance', label: 'بررسی Content Credentials', detail: 'ساختار فایل و C2PA در حال بررسی است' });
+  let provenancePercent = 50;
+  const heartbeat = window.setInterval(() => {
+    provenancePercent = Math.min(76, provenancePercent + (provenancePercent < 64 ? 3 : 1));
+    onProgress?.({ percent: provenancePercent, stage: 'provenance', label: 'بررسی اصالت و C2PA', detail: 'در اولین اجرا ممکن است چند لحظه زمان ببرد' });
+  }, 320);
+  let container: ContainerInspection;
+  let c2pa: C2paSummary | undefined;
+  try {
+    [container, c2pa] = await Promise.all([inspectContainer(buffer), readC2pa(file)]);
+  } finally {
+    window.clearInterval(heartbeat);
+  }
+  onProgress?.({ percent: 80, stage: 'provenance', label: 'بررسی اصالت تمام شد', detail: 'در حال جمع‌بندی نشانه‌ها' });
   const metadataJson = JSON.stringify(cleanRaw);
   const c2paSearch = c2pa ? JSON.stringify({ claimGenerator: c2pa.claimGenerator, actions: c2pa.actions, digitalSourceTypes: c2pa.digitalSourceTypes }) : '';
   const searchCorpus = [metadataJson, ...container.searchText, c2paSearch].join('\n');
+  onProgress?.({ percent: 88, stage: 'detection', label: 'تشخیص ردپای هوش مصنوعی', detail: 'نشانه‌ها و تاریخچه فایل در حال جمع‌بندی است' });
   const generation = extractGenerationDetails(container.textEntries, tags, searchCorpus);
   const detection = verdict(tags, searchCorpus, container.provenanceMatches, c2pa, generation);
   const editHistory = softwareEditHistory(tags, searchCorpus, c2pa?.actions ?? []);
@@ -507,12 +550,15 @@ export async function analyzeImage(file: File): Promise<ImageAnalysis> {
   const credentials = c2paSection(c2pa);
   const raw = c2pa?.raw ? { ...cleanRaw, C2PA: c2pa.raw } : cleanRaw;
 
-  return {
+  onProgress?.({ percent: 96, stage: 'detection', label: 'ساخت گزارش', detail: 'نتیجه نهایی تقریباً آماده است' });
+  const result: ImageAnalysis = {
     fileName: file.name, fileType: file.type || 'unknown', fileSize: file.size, width, height, previewUrl,
     detection, sections: [camera, software, specs, credentials, location, containerSection].filter((item): item is MetadataSection => Boolean(item)),
     raw, gps, generation, editHistory, c2pa,
     binaryMarkers: detection.matches.map((match) => match.marker),
   };
+  onProgress?.({ percent: 100, stage: 'complete', label: 'تحلیل کامل شد', detail: 'نمایش گزارش نهایی' });
+  return result;
 }
 
 export function createDemoAnalysis(kind: 'ai' | 'edited' | 'camera'): ImageAnalysis {

@@ -9,11 +9,12 @@ import { GenerationInspector } from './components/GenerationInspector';
 import { EditHistory } from './components/EditHistory';
 import { MetadataSanitizer } from './components/MetadataSanitizer';
 import { analyzeImage, createDemoAnalysis } from './lib/analyzeImage';
-import type { ImageAnalysis } from './types';
+import type { AnalysisProgress, ImageAnalysis } from './types';
 
 function App() {
   const [dark, setDark] = useState(() => localStorage.getItem('theme') !== 'light');
   const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState<AnalysisProgress | null>(null);
   const [error, setError] = useState('');
   const [analysis, setAnalysis] = useState<ImageAnalysis | null>(null);
   const [sourceFile, setSourceFile] = useState<File | null>(null);
@@ -29,19 +30,21 @@ function App() {
 
   const handleFile = async (file: File) => {
     setBusy(true);
+    setProgress({ percent: 1, stage: 'reading', label: 'آماده‌سازی فایل', detail: 'شروع پردازش روی دستگاه شما' });
     setError('');
     try {
       if (analysis?.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(analysis.previewUrl);
       setSourceFile(file);
-      setAnalysis(await analyzeImage(file));
+      setAnalysis(await analyzeImage(file, setProgress));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'نتوانستم این تصویر را بررسی کنم.');
-    } finally { setBusy(false); }
+    } finally { setBusy(false); setProgress(null); }
   };
 
   const demo = (kind: 'ai' | 'edited' | 'camera') => {
     if (analysis?.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(analysis.previewUrl);
     setSourceFile(null);
+    setProgress(null);
     setError('');
     setAnalysis(createDemoAnalysis(kind));
   };
@@ -50,6 +53,7 @@ function App() {
     if (analysis?.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(analysis.previewUrl);
     setAnalysis(null);
     setSourceFile(null);
+    setProgress(null);
     setError('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -96,7 +100,7 @@ function App() {
               </p>
             </section>
 
-            <div className="mx-auto mt-9 max-w-[920px]"><Dropzone onFile={handleFile} busy={busy} /></div>
+            <div className="mx-auto mt-9 max-w-[920px]"><Dropzone onFile={handleFile} busy={busy} progress={progress} /></div>
             {error && <div className="mx-auto mt-4 max-w-[920px] rounded-2xl border border-red-200/70 bg-red-50/80 px-4 py-3 text-sm text-red-700 shadow-sm dark:border-red-900/50 dark:bg-red-950/25 dark:text-red-300">{error}</div>}
 
             <section className="mx-auto mt-8 max-w-[920px]">

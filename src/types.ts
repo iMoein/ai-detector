@@ -1,5 +1,13 @@
 export type DetectionKind = 'ai' | 'edited' | 'camera' | 'unknown';
 
+
+export interface AnalysisProgress {
+  percent: number;
+  stage: 'reading' | 'metadata' | 'provenance' | 'detection' | 'complete';
+  label: string;
+  detail?: string;
+}
+
 export interface DetectionMatch {
   source: string;
   marker: string;

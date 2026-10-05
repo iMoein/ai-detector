@@ -127,3 +127,7 @@ button { cursor: pointer; }
 @keyframes scan-line { 0% { transform: translateY(-110%); opacity: 0 } 15%,85% { opacity: .8 } 100% { transform: translateY(480%); opacity: 0 } }
 @keyframes fade-up { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
 .animate-fade-up { animation: fade-up .45s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes progress-sheen {
+  0% { transform: translateX(130%); }
+  100% { transform: translateX(-220%); }
+}
