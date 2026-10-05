@@ -8,7 +8,9 @@ import { RawJsonViewer } from './components/RawJsonViewer';
 import { GenerationInspector } from './components/GenerationInspector';
 import { EditHistory } from './components/EditHistory';
 import { MetadataSanitizer } from './components/MetadataSanitizer';
+import { UsageCounter } from './components/UsageCounter';
 import { analyzeImage, createDemoAnalysis } from './lib/analyzeImage';
+import { trackAnalysis } from './lib/stats';
 import type { AnalysisProgress, ImageAnalysis } from './types';
 
 function App() {
@@ -35,7 +37,9 @@ function App() {
     try {
       if (analysis?.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(analysis.previewUrl);
       setSourceFile(file);
-      setAnalysis(await analyzeImage(file, setProgress));
+      const nextAnalysis = await analyzeImage(file, setProgress);
+      setAnalysis(nextAnalysis);
+      void trackAnalysis(nextAnalysis.detection.kind);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'نتوانستم این تصویر را بررسی کنم.');
     } finally { setBusy(false); setProgress(null); }
@@ -158,7 +162,7 @@ function App() {
                   </details>
                   <details className="group px-5 py-4 sm:px-6">
                     <summary className="cursor-pointer list-none text-sm font-semibold">آیا فایل تصویر برای تحلیل آپلود می‌شود؟</summary>
-                    <p className="app-muted mt-2 text-xs leading-6">خیر. خواندن فایل و تحلیل متادیتا داخل مرورگر و روی دستگاه شما انجام می‌شود.</p>
+                    <p className="app-muted mt-2 text-xs leading-6">خیر. فایل تصویر و نام آن برای تحلیل به سرور ارسال نمی‌شود. فقط بعد از پایان موفق تحلیل، نوع نتیجه برای شمارش ناشناس میزان استفاده ثبت می‌شود؛ در D1 فقط شمارنده‌های تجمیعی روزانه نگه داشته می‌شوند.</p>
                   </details>
                   <details className="group px-5 py-4 sm:px-6">
                     <summary className="cursor-pointer list-none text-sm font-semibold">چه فرمت‌هایی پشتیبانی می‌شوند؟</summary>
@@ -203,6 +207,8 @@ function App() {
       </main>
 
       <footer className="app-muted mx-auto flex max-w-[1240px] flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 pb-8 text-center text-[10px] tracking-wide sm:px-6">
+        <UsageCounter />
+        <span aria-hidden="true">·</span>
         <span>بررسی تصویر · پردازش محلی و خصوصی</span>
         <span aria-hidden="true">·</span>
         <a href="https://imoein.com/" className="font-semibold text-zinc-700 underline decoration-zinc-300 underline-offset-4 transition-colors hover:text-zinc-950 dark:text-zinc-300 dark:decoration-zinc-700 dark:hover:text-white">

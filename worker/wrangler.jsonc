@@ -1,0 +1,31 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "ai-detector-stats",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-05",
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "ai-detector.imoein.com/api/*",
+      "zone_name": "imoein.com"
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "ANALYSIS_RATE_LIMITER",
+      "namespace_id": "3498176321",
+      "simple": {
+        "limit": 30,
+        "period": 60
+      }
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ai-detector-stats",
+      "database_id": "926ea665-9bc6-482d-aab8-3ab38d5627b1",
+      "migrations_dir": "migrations"
+    }
+  ]
+}
