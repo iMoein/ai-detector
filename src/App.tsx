@@ -73,7 +73,7 @@ function App() {
               <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-30" /><span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" /></span>
               پردازش خصوصی روی دستگاه شما
             </div>
-            <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="گیت‌هاب" className="app-icon-button"><Code2 className="h-4 w-4" /></a>
+            <a href="https://github.com/iMoein/ai-detector" target="_blank" rel="noreferrer" aria-label="گیت‌هاب" className="app-icon-button"><Code2 className="h-4 w-4" /></a>
             <button type="button" onClick={() => setDark((value) => !value)} aria-label="تغییر حالت روشن و تیره" className="app-icon-button">{dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}</button>
           </div>
         </div>

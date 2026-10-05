@@ -1,46 +1,70 @@
 # AI Detector
 
-A privacy-first, client-side image provenance inspector and metadata sanitizer.
+AI Detector is a privacy-first image provenance inspector and metadata sanitizer. It examines the evidence embedded in an image and classifies it as AI-generated, AI-edited, camera-captured, or unknown.
 
-The app analyzes image files locally in the browser to surface camera EXIF data, AI-generation and AI-editing markers, PNG generation parameters, C2PA / Content Credentials, prompts, workflow metadata, and edit history. It can also create sanitized copies with metadata removed while preserving image data losslessly for supported formats.
+The interface is in Persian, supports light and dark themes, and uses a locally hosted Vazirmatn font.
 
-## Features
+## What it inspects
 
-- AI-generated vs AI-edited vs camera-captured vs unknown classification
-- C2PA / Content Credentials parsing and validation
-- ComfyUI, Stable Diffusion WebUI, FLUX, Midjourney, DALL-E, Firefly and editor marker detection
-- Prompt, negative prompt, seed, sampler, model and workflow extraction when embedded
-- EXIF, XMP and file-structure inspection
-- Lossless metadata stripping for PNG, JPEG and WebP when keeping the original format
-- Fully client-side processing; images are not uploaded to an application server
-- Persian RTL interface with locally hosted Vazirmatn font
+- EXIF camera, lens, exposure, date, software, and GPS fields
+- XMP metadata and embedded editing history
+- PNG text chunks, generation parameters, prompts, negative prompts, seeds, samplers, models, and ComfyUI workflows
+- Markers associated with Stable Diffusion, ComfyUI, FLUX, Midjourney, DALL-E, Adobe Firefly, and other generators or editors
+- C2PA / Content Credentials manifests, signatures, source types, and recorded actions
+- File-container evidence that can distinguish AI generation, AI-assisted editing, camera capture, or an unknown source
+
+## Metadata sanitizer
+
+The built-in sanitizer can create a clean copy with metadata removed. PNG, JPEG, and WebP support lossless metadata removal when the original format is retained; supported browser image formats can also be exported to PNG, JPEG, or WebP.
+
+## Privacy
+
+Image analysis and sanitization happen entirely in the browser. Selected files are not uploaded to an application server.
+
+## Supported formats
+
+The analyzer accepts PNG, JPEG, WebP, GIF, TIFF, HEIC, and HEIF images. Metadata availability varies by format, browser support, and the information retained by the software that produced the file.
+
+## Tech stack
+
+- React 19 and TypeScript
+- Vite
+- Tailwind CSS
+- ExifReader
+- `@contentauth/c2pa-web` for C2PA / Content Credentials
+- Lucide React icons
 
 ## Local development
+
+Requires Node.js 22 or later.
 
 ```bash
 npm ci
 npm run dev
 ```
 
-Production checks:
+## Production build
+
+Run the same checks used for deployment:
 
 ```bash
 npm run lint
 npm run build
 ```
 
-## Deployment
+The production output is written to `dist/`.
 
-The repository includes a GitHub Pages workflow. Pushes to `main` automatically build and deploy the Vite application.
+## GitHub Pages deployment
 
-Custom domain:
+The workflow in `.github/workflows/deploy-pages.yml` runs on every push to `main`. It installs the locked dependencies with `npm ci`, builds the Vite app, uploads `dist/` as the Pages artifact, and deploys it with the official GitHub Pages Actions.
 
-```text
-ai-detector.imoein.com
-```
+The site uses relative Vite asset paths so the same build works at both the repository Pages URL and the custom domain:
 
-The DNS record should be a `CNAME` from `ai-detector` to `imoein.github.io`.
+- `https://imoein.github.io/ai-detector/`
+- `https://ai-detector.imoein.com`
 
-## Privacy note
+The custom domain is declared in `public/CNAME`. Its DNS record must be a CNAME from `ai-detector` to `imoein.github.io`.
 
-Analysis and sanitization run in the browser. Detection is evidence-based: missing metadata does not prove that an image is authentic or synthetic.
+## Limitations and disclaimer
+
+The result is based on metadata and provenance evidence found in the file. Metadata can be removed, altered, forged, or lost during export, download, messaging, or recompression. A result—including the absence of AI markers—is not absolute forensic proof that an image is authentic, synthetic, or unedited.
