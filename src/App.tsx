@@ -93,10 +93,10 @@ function App() {
                 <span className="inline-flex items-center gap-2 rounded-full border app-hairline bg-white/60 px-3 py-1.5 text-[11px] font-semibold text-zinc-600 backdrop-blur dark:bg-white/[.04] dark:text-zinc-300"><WandSparkles className="h-3.5 w-3.5" />تشخیص AI و ویرایش AI</span>
               </div>
               <h1 className="text-balance text-[42px] font-[760] leading-[1.15] tracking-[-0.055em] text-zinc-950 sm:text-[58px] dark:text-white">
-                حقیقتی که داخل خودِ تصویر ذخیره شده را ببین.
+                تشخیص ردپای هوش مصنوعی در عکس، بدون آپلود فایل.
               </h1>
               <p className="app-muted mx-auto mt-5 max-w-2xl text-pretty text-[15px] leading-8 sm:text-[17px]">
-                متادیتا، اطلاعات دوربین، Content Credentials و نشانه‌های ابزارهای هوش مصنوعی را بدون ارسال فایل به هیچ سروری بررسی کن.
+                متادیتا، EXIF، اطلاعات دوربین، C2PA و Content Credentials را بررسی کن تا نشانه‌های ساخت یا ویرایش تصویر با هوش مصنوعی را ببینی؛ همه‌چیز داخل مرورگر انجام می‌شود.
               </p>
             </section>
 
@@ -118,6 +118,53 @@ function App() {
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-300"><Camera className="h-[18px] w-[18px]" /></span>
                   <span><span className="block text-[13px] font-bold">ثبت‌شده با دوربین</span><span className="app-muted mt-1 block text-[11px]">EXIF کامل سونی</span></span>
                 </button>
+              </div>
+            </section>
+
+            <section aria-labelledby="how-it-works" className="mx-auto mt-16 max-w-[920px]">
+              <div className="mx-auto max-w-2xl text-center">
+                <h2 id="how-it-works" className="text-2xl font-[750] tracking-[-0.035em] sm:text-3xl">این ابزار دقیقاً چه چیزی را در عکس بررسی می‌کند؟</h2>
+                <p className="app-muted mt-3 text-sm leading-7">به‌جای حدس از روی ظاهر تصویر، شواهدی را می‌خوانیم که داخل خود فایل ذخیره شده‌اند.</p>
+              </div>
+              <div className="mt-7 grid gap-3 md:grid-cols-3">
+                <article className="app-panel rounded-[22px] p-5">
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-[13px] bg-violet-500/10 text-violet-600 dark:text-violet-300"><Sparkles className="h-[17px] w-[17px]" /></div>
+                  <h3 className="text-sm font-bold">ردپای ساخت یا ویرایش با AI</h3>
+                  <p className="app-muted mt-2 text-xs leading-6">پرامپت، workflow، نام مدل، نرم‌افزار سازنده و نشانه‌های ابزارهایی مثل ComfyUI، Stable Diffusion، Firefly و Midjourney بررسی می‌شوند.</p>
+                </article>
+                <article className="app-panel rounded-[22px] p-5">
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-[13px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-300"><Camera className="h-[17px] w-[17px]" /></div>
+                  <h3 className="text-sm font-bold">EXIF و اطلاعات دوربین</h3>
+                  <p className="app-muted mt-2 text-xs leading-6">مدل دوربین، لنز، ISO، سرعت شاتر، دیافراگم، تاریخ ثبت و سایر اطلاعات فنی موجود در فایل خوانده می‌شوند.</p>
+                </article>
+                <article className="app-panel rounded-[22px] p-5">
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-[13px] bg-sky-500/10 text-sky-600 dark:text-sky-300"><BadgeCheck className="h-[17px] w-[17px]" /></div>
+                  <h3 className="text-sm font-bold">C2PA و Content Credentials</h3>
+                  <p className="app-muted mt-2 text-xs leading-6">اگر تصویر سابقه اصالت دیجیتال داشته باشد، مانیفست، امضا و رویدادهای ساخت یا ویرایش ثبت‌شده در آن بررسی می‌شوند.</p>
+                </article>
+              </div>
+            </section>
+
+            <section aria-labelledby="ai-photo-faq" className="mx-auto mt-14 max-w-[920px]">
+              <div className="app-panel overflow-hidden rounded-[24px]">
+                <div className="border-b app-hairline px-5 py-5 sm:px-6">
+                  <h2 id="ai-photo-faq" className="text-lg font-[730] tracking-[-0.02em]">درباره تشخیص عکس ساخته‌شده با هوش مصنوعی</h2>
+                  <p className="app-muted mt-1.5 text-xs leading-6">چند نکته مهم درباره معنی نتیجه‌ای که برنامه نشان می‌دهد.</p>
+                </div>
+                <div className="divide-y divide-zinc-200/60 dark:divide-white/[.06]">
+                  <details className="group px-5 py-4 sm:px-6">
+                    <summary className="cursor-pointer list-none text-sm font-semibold">آیا می‌شود با قطعیت فهمید یک عکس با هوش مصنوعی ساخته شده؟</summary>
+                    <p className="app-muted mt-2 text-xs leading-6">نه همیشه. این ابزار شواهد متادیتا و provenance را بررسی می‌کند. اگر این اطلاعات حذف شده باشند، نبودن ردپای AI به‌تنهایی اصالت عکس را ثابت نمی‌کند.</p>
+                  </details>
+                  <details className="group px-5 py-4 sm:px-6">
+                    <summary className="cursor-pointer list-none text-sm font-semibold">آیا فایل تصویر برای تحلیل آپلود می‌شود؟</summary>
+                    <p className="app-muted mt-2 text-xs leading-6">خیر. خواندن فایل و تحلیل متادیتا داخل مرورگر و روی دستگاه شما انجام می‌شود.</p>
+                  </details>
+                  <details className="group px-5 py-4 sm:px-6">
+                    <summary className="cursor-pointer list-none text-sm font-semibold">چه فرمت‌هایی پشتیبانی می‌شوند؟</summary>
+                    <p className="app-muted mt-2 text-xs leading-6">JPG/JPEG، PNG، WebP، TIFF و AVIF قابل انتخاب هستند؛ مقدار اطلاعات قابل استخراج به ساختار و متادیتای موجود در خود فایل بستگی دارد.</p>
+                  </details>
+                </div>
               </div>
             </section>
           </div>

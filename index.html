@@ -2,13 +2,88 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="بررسی اطلاعات داخل تصویر و پیدا کردن ردپای دوربین یا ابزارهای هوش مصنوعی" />
-    <title>بررسی‌کننده تصویر</title>
+
+    <title>تشخیص ردپای هوش مصنوعی در عکس | EXIF و C2PA</title>
+    <meta name="description" content="ابزار رایگان بررسی عکس برای یافتن ردپای ساخت یا ویرایش با هوش مصنوعی، EXIF، C2PA و Content Credentials؛ کاملاً داخل مرورگر و بدون آپلود فایل." />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta name="googlebot" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta name="application-name" content="بررسی تصویر" />
+    <meta name="theme-color" content="#090b0f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="light dark" />
+
+    <link rel="canonical" href="https://ai-detector.imoein.com/" />
+    <link rel="alternate" hreflang="fa" href="https://ai-detector.imoein.com/" />
+    <link rel="alternate" hreflang="x-default" href="https://ai-detector.imoein.com/" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fa_IR" />
+    <meta property="og:site_name" content="بررسی تصویر" />
+    <meta property="og:title" content="تشخیص ردپای هوش مصنوعی در عکس" />
+    <meta property="og:description" content="EXIF، C2PA، Content Credentials و ردپای ابزارهای ساخت یا ویرایش با هوش مصنوعی را بدون آپلود فایل بررسی کن." />
+    <meta property="og:url" content="https://ai-detector.imoein.com/" />
+    <meta property="og:image" content="https://ai-detector.imoein.com/og-image.png" />
+    <meta property="og:image:secure_url" content="https://ai-detector.imoein.com/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="بررسی ردپای هوش مصنوعی، EXIF و C2PA در تصویر" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="تشخیص ردپای هوش مصنوعی در عکس" />
+    <meta name="twitter:description" content="متادیتا، EXIF و Content Credentials تصویر را خصوصی و داخل مرورگر بررسی کن." />
+    <meta name="twitter:image" content="https://ai-detector.imoein.com/og-image.png" />
+    <meta name="twitter:image:alt" content="بررسی ردپای هوش مصنوعی، EXIF و C2PA در تصویر" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://ai-detector.imoein.com/#website",
+            "url": "https://ai-detector.imoein.com/",
+            "name": "بررسی تصویر",
+            "description": "بررسی متادیتا و ردپای هوش مصنوعی در تصاویر",
+            "inLanguage": "fa"
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://ai-detector.imoein.com/#app",
+            "url": "https://ai-detector.imoein.com/",
+            "name": "تشخیص ردپای هوش مصنوعی در عکس",
+            "description": "ابزار رایگان و سمت کاربر برای بررسی EXIF، C2PA، Content Credentials و نشانه‌های ساخت یا ویرایش تصویر با هوش مصنوعی.",
+            "applicationCategory": "MultimediaApplication",
+            "operatingSystem": "Any",
+            "browserRequirements": "Requires JavaScript and a modern web browser",
+            "isAccessibleForFree": true,
+            "inLanguage": "fa",
+            "featureList": [
+              "بررسی EXIF و اطلاعات دوربین",
+              "بررسی C2PA و Content Credentials",
+              "شناسایی ردپای ابزارهای ساخت تصویر با هوش مصنوعی",
+              "شناسایی نشانه‌های ویرایش تصویر با هوش مصنوعی",
+              "پاک‌سازی متادیتا به‌صورت محلی",
+              "پردازش داخل مرورگر بدون آپلود فایل"
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main style="max-width:900px;margin:80px auto;padding:24px;font-family:Tahoma,Arial,sans-serif;text-align:center;line-height:1.9">
+        <h1>تشخیص ردپای هوش مصنوعی در عکس، بدون آپلود فایل</h1>
+        <p>این ابزار متادیتا، EXIF، C2PA و Content Credentials تصویر را بررسی می‌کند تا نشانه‌های ساخت یا ویرایش با هوش مصنوعی و اطلاعات ثبت با دوربین را پیدا کند. پردازش روی دستگاه شما انجام می‌شود.</p>
+        <p>از JPG، PNG، WebP، TIFF و AVIF پشتیبانی می‌شود. نبودن متادیتا به‌تنهایی واقعی یا ساختگی بودن تصویر را ثابت نمی‌کند.</p>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
