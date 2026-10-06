@@ -20,6 +20,40 @@
     <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
+    <link rel="preload" href="/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin />
+
+    <script>
+      try {
+        if (localStorage.getItem('theme') !== 'light') document.documentElement.classList.add('dark');
+      } catch {}
+    </script>
+    <style>
+      html,body{margin:0;min-width:320px;min-height:100%;background:#f6f7f9;color:#111318}
+      html.dark,html.dark body{background:#090b0f;color:#f5f7fa}
+      body{min-height:100vh;overflow-x:hidden}
+      #root{opacity:0;visibility:hidden;transition:opacity .28s ease}
+      #boot-screen{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:#f6f7f9;transition:opacity .28s ease,visibility .28s ease}
+      html.dark #boot-screen{background:#090b0f}
+      .boot-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;padding:24px;text-align:center;font-family:Tahoma,Arial,sans-serif}
+      .boot-mark{position:relative;display:grid;height:64px;width:64px;place-items:center;border-radius:20px;background:#111318;color:#fff;box-shadow:0 18px 50px rgba(15,23,42,.15)}
+      html.dark .boot-mark{background:#f7f8fa;color:#111318;box-shadow:0 22px 60px rgba(0,0,0,.34)}
+      .boot-mark:after{content:"";position:absolute;inset:-7px;border:1px solid rgba(99,102,241,.26);border-radius:25px;animation:boot-pulse 1.45s ease-in-out infinite}
+      .boot-scan{position:relative;height:18px;width:18px;border:2px solid currentColor;border-radius:6px;opacity:.92}
+      .boot-scan:before,.boot-scan:after{content:"";position:absolute;background:currentColor;border-radius:2px}
+      .boot-scan:before{left:3px;right:3px;top:7px;height:2px;animation:boot-scan 1.2s ease-in-out infinite}
+      .boot-scan:after{height:4px;width:4px;right:-3px;bottom:-3px;box-shadow:0 0 0 2px currentColor}
+      .boot-title{font-size:14px;font-weight:700;letter-spacing:-.01em}
+      .boot-subtitle{margin-top:-10px;font-size:11px;color:#707783}
+      html.dark .boot-subtitle{color:#949ba7}
+      .boot-progress{height:3px;width:112px;overflow:hidden;border-radius:999px;background:rgba(100,116,139,.13)}
+      .boot-progress span{display:block;height:100%;width:42%;border-radius:inherit;background:#6366f1;animation:boot-progress 1.05s ease-in-out infinite}
+      html.app-ready #root{opacity:1;visibility:visible}
+      html.app-ready #boot-screen{opacity:0;visibility:hidden;pointer-events:none}
+      @keyframes boot-pulse{0%,100%{transform:scale(.96);opacity:.25}50%{transform:scale(1.04);opacity:.7}}
+      @keyframes boot-scan{0%,100%{transform:translateY(-3px);opacity:.35}50%{transform:translateY(3px);opacity:1}}
+      @keyframes boot-progress{0%{transform:translateX(170%)}100%{transform:translateX(-270%)}}
+      @media (prefers-reduced-motion:reduce){#root,#boot-screen{transition:none}.boot-mark:after,.boot-scan:before,.boot-progress span{animation:none}}
+    </style>
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="fa_IR" />
@@ -77,6 +111,14 @@
     </script>
   </head>
   <body>
+    <div id="boot-screen" role="status" aria-label="در حال آماده‌سازی برنامه">
+      <div class="boot-wrap">
+        <div class="boot-mark" aria-hidden="true"><span class="boot-scan"></span></div>
+        <div class="boot-title">بررسی تصویر</div>
+        <div class="boot-subtitle">در حال آماده‌سازی ابزار تحلیل…</div>
+        <div class="boot-progress" aria-hidden="true"><span></span></div>
+      </div>
+    </div>
     <div id="root">
       <main style="max-width:900px;margin:80px auto;padding:24px;font-family:Tahoma,Arial,sans-serif;text-align:center;line-height:1.9">
         <h1>تشخیص ردپای هوش مصنوعی در عکس، بدون آپلود فایل</h1>
@@ -85,5 +127,8 @@
       </main>
     </div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      window.setTimeout(() => document.documentElement.classList.add('app-ready'), 10000);
+    </script>
   </body>
 </html>

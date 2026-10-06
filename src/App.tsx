@@ -27,6 +27,13 @@ function App() {
     localStorage.setItem('theme', dark ? 'dark' : 'light');
   }, [dark]);
 
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      document.documentElement.classList.add('app-ready');
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
   useEffect(() => () => {
     if (analysis?.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(analysis.previewUrl);
   }, [analysis]);
