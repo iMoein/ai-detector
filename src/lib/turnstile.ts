@@ -94,6 +94,15 @@ function ensureWidget() {
   return widgetId;
 }
 
+export async function prepareTurnstile() {
+  try {
+    await loadTurnstile();
+    ensureWidget();
+  } catch {
+    // Usage analytics must never interrupt image analysis.
+  }
+}
+
 export async function getTurnstileToken() {
   await loadTurnstile();
   const api = window.turnstile;

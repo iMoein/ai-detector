@@ -11,6 +11,7 @@ import { MetadataSanitizer } from './components/MetadataSanitizer';
 import { UsageCounter } from './components/UsageCounter';
 import { analyzeImage, createDemoAnalysis } from './lib/analyzeImage';
 import { trackAnalysis } from './lib/stats';
+import { prepareTurnstile } from './lib/turnstile';
 import type { AnalysisProgress, ImageAnalysis } from './types';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
   }, [analysis]);
 
   const handleFile = async (file: File) => {
+    void prepareTurnstile();
     setBusy(true);
     setProgress({ percent: 1, stage: 'reading', label: 'آماده‌سازی فایل', detail: 'شروع پردازش روی دستگاه شما' });
     setError('');
@@ -206,7 +208,7 @@ function App() {
         )}
       </main>
 
-      <div id="usage-turnstile" className="fixed bottom-4 left-4 z-[100] max-w-[calc(100vw-2rem)]" aria-live="polite" />
+      <div id="usage-turnstile" className="pointer-events-none fixed left-[-9999px] top-0 h-px w-px overflow-hidden opacity-0" aria-hidden="true" />
 
       <footer className="app-muted mx-auto flex max-w-[1240px] flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 pb-8 text-center text-[10px] tracking-wide sm:px-6">
         <UsageCounter />
